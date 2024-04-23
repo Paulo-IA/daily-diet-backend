@@ -20,7 +20,20 @@ export async function authRoute(app: FastifyInstance) {
       .first()
 
     if (user) {
-      return reply.status(200).send()
+      let userLoggedIn = request.cookies.userLoggedIn
+
+      if (!userLoggedIn) {
+        userLoggedIn = user.userId
+
+        reply.cookie('userLoggedIn', userLoggedIn, {
+          path: '/',
+          maxAge: 60 * 60 * 24, // 1 day
+        })
+
+        return reply.status(200).send()
+      }
+
+      return reply.status(404).send({ message: 'You are already logged!' })
     }
 
     return reply.status(404).send({ message: 'User not found!' })
