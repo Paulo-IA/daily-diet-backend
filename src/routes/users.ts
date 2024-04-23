@@ -4,23 +4,39 @@ import { FastifyInstance } from 'fastify'
 import { z } from 'zod'
 
 export async function usersRoutes(app: FastifyInstance) {
+  app.get('/', async () => {
+    const users = await knex('users').select('*')
+
+    return { users }
+  })
+
   app.post('/', async (request, reply) => {
     const createUserBodySchema = z.object({
       name: z.string(),
+      email: z.string(),
+      password: z.string(),
     })
 
-    const { name } = createUserBodySchema.parse(request.body)
+    const { name, email, password } = createUserBodySchema.parse(request.body)
 
-    await knex('users').insert({
-      userId: randomUUID(),
-      name,
-    })
+    const user = await knex('users')
+      .where({
+        email,
+      })
+      .select()
+      .first()
 
-    reply.status(201).send()
-  })
+    if (!user) {
+      await knex('users').insert({
+        userId: randomUUID(),
+        name,
+        email,
+        password,
+      })
 
-  app.get('/', async () => {
-    const users = await knex('users').select()
-    return { users }
+      return reply.status(201).send()
+    }
+
+    return reply.status(404).send({ message: 'User already signed up' })
   })
 }

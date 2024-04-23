@@ -1,13 +1,13 @@
 # RF
 
   ## /users
-  [] Deve ser possível criar um usuário.
+  [✅] Deve ser possível criar um usuário.
 
   ## /snacks
-  [] Deve ser possível criar uma refeição.
+  [✅] Deve ser possível criar uma refeição.
   [] Deve ser possível editar uma refeição.
   [] Deve ser possível apagar uma refeição.
-  [] Deve ser possível listar todas as refeições.
+  [✅] Deve ser possível listar todas as refeições.
   [] Deve ser possível listar uma refeição específica.
 
   ## /snacks/metrics
