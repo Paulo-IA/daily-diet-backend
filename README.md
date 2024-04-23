@@ -18,7 +18,7 @@
 
 # RN
 
-  [] Deve ser possível identificar o usuário entre as requisições.
-  [] O usuário só pode visualizar refeições que ele mesmo as fez.
-  [] A refeição pode estar dentro, ou fora da dieta.
+  [✅] Deve ser possível identificar o usuário entre as requisições.
+  [✅] O usuário só pode visualizar refeições que ele mesmo as fez.
+  [✅] A refeição pode estar dentro, ou fora da dieta.
   [] A melhor sequência deve ser definida primerio por quantidade de refeições e depois por data.

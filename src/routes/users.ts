@@ -2,6 +2,7 @@ import { randomUUID } from 'crypto'
 import { knex } from '../database'
 import { FastifyInstance } from 'fastify'
 import { z } from 'zod'
+import { getDateInString } from '../utils/format-date-and-hour'
 
 export async function usersRoutes(app: FastifyInstance) {
   app.get('/', async () => {
@@ -26,12 +27,15 @@ export async function usersRoutes(app: FastifyInstance) {
       .select()
       .first()
 
+    const createdAt = getDateInString()
+
     if (!user) {
       await knex('users').insert({
         userId: randomUUID(),
         name,
         email,
         password,
+        created_at: createdAt,
       })
 
       return reply.status(201).send()

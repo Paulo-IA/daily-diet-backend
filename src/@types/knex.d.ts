@@ -17,7 +17,7 @@ declare module 'knex/types/tables' {
       inDiet: boolean
       date: string
       created_at: string
-      updated_at: string
+      updated_at?: string
     }
   }
 }
