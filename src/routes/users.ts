@@ -5,12 +5,6 @@ import { z } from 'zod'
 import { getDateInString } from '../utils/time-functions'
 
 export async function usersRoutes(app: FastifyInstance) {
-  app.get('/', async () => {
-    const users = await knex('users').select('*')
-
-    return { users }
-  })
-
   app.post('/', async (request, reply) => {
     const createUserBodySchema = z.object({
       name: z.string(),

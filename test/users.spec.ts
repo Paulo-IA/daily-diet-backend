@@ -4,7 +4,7 @@ import { app } from '../src/app'
 import { randomEmail } from '../src/utils/random-email'
 import { execSync } from 'node:child_process'
 
-describe('Users routes', () => {
+describe('User and auth routes', () => {
   beforeAll(async () => {
     await app.ready()
   })
@@ -27,5 +27,27 @@ describe('Users routes', () => {
         password: '123',
       })
       .expect(201)
+  })
+
+  it('should be able to auth an user', async () => {
+    const email = randomEmail()
+    const password = '123'
+
+    await request(app.server)
+      .post('/users')
+      .send({
+        name: 'Paulo Fernandes',
+        email,
+        password,
+      })
+      .expect(201)
+
+    await request(app.server)
+      .post('/auth')
+      .send({
+        email,
+        password,
+      })
+      .expect(200)
   })
 })
