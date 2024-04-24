@@ -97,4 +97,64 @@ describe('Snacks routes', () => {
       }),
     ])
   })
+
+  it('should be able to update a snack', async () => {
+    const email = randomEmail()
+    const password = '123'
+
+    await request(app.server).post('/users').send({
+      name: 'Paulo Fernandes',
+      email,
+      password,
+    })
+
+    const authUserResponse = await request(app.server).post('/auth').send({
+      email,
+      password,
+    })
+
+    const cookies = authUserResponse.get('Set-Cookie') ?? []
+
+    await request(app.server).post('/snacks').set('Cookie', cookies).send({
+      name: 'Almoço',
+      description: 'Arroz, feijão, salada, legumes e frango grelhado',
+      date: '23/04/2024',
+      hour: '12:43',
+      inDiet: true,
+    })
+
+    const listSnacksResponse = await request(app.server)
+      .get('/snacks')
+      .set('Cookie', cookies)
+
+    const { snackId, description } = listSnacksResponse.body.snacks[0]
+
+    expect(description).toEqual(
+      'Arroz, feijão, salada, legumes e frango grelhado',
+    )
+
+    await request(app.server)
+      .put(`/snacks/${snackId}`)
+      .set('Cookie', cookies)
+      .send({
+        name: 'Almoço',
+        description: 'Arroz, feijoada, salada, legumes e frango grelhado',
+        date: '23/04/2024',
+        hour: '12:43',
+        inDiet: true,
+      })
+      .expect(200)
+
+    // list again and compare
+    const updatedListSnackResponse = await request(app.server)
+      .get('/snacks')
+      .set('Cookie', cookies)
+
+    const descriptionUpdated =
+      updatedListSnackResponse.body.snacks[0].description
+
+    expect(descriptionUpdated).toEqual(
+      'Arroz, feijoada, salada, legumes e frango grelhado',
+    )
+  })
 })
