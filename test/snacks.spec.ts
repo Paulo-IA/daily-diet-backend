@@ -156,4 +156,41 @@ describe('Snacks routes', () => {
       'Arroz, feijoada, salada, legumes e frango grelhado',
     )
   })
+
+  it('should be able to delete an snack', async () => {
+    const email = randomEmail()
+    const password = '123'
+
+    await request(app.server).post('/users').send({
+      name: 'Paulo Fernandes',
+      email,
+      password,
+    })
+
+    const authUserResponse = await request(app.server).post('/auth').send({
+      email,
+      password,
+    })
+
+    const cookies = authUserResponse.get('Set-Cookie') ?? []
+
+    await request(app.server).post('/snacks').set('Cookie', cookies).send({
+      name: 'Almoço',
+      description: 'Arroz, feijão, salada, legumes e frango grelhado',
+      date: '23/04/2024',
+      hour: '12:43',
+      inDiet: true,
+    })
+
+    const listSnacksResponse = await request(app.server)
+      .get('/snacks')
+      .set('Cookie', cookies)
+
+    const { snackId } = listSnacksResponse.body.snacks[0]
+
+    await request(app.server)
+      .delete(`/snacks/${snackId}`)
+      .set('Cookie', cookies)
+      .expect(200)
+  })
 })
