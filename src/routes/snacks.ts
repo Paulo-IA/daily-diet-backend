@@ -64,11 +64,11 @@ export async function snacksRoutes(app: FastifyInstance) {
       preHandler: [checkIfUserIsLoggedIn],
     },
     async (request, reply) => {
-      const createSnacksParamsSchema = z.object({
-        id: z.string(),
+      const createUpdateSnacksParamsSchema = z.object({
+        id: z.string().uuid(),
       })
 
-      const { id } = createSnacksParamsSchema.parse(request.params)
+      const { id } = createUpdateSnacksParamsSchema.parse(request.params)
 
       const createSnacksBodySchema = z.object({
         name: z.string(),
@@ -84,13 +84,41 @@ export async function snacksRoutes(app: FastifyInstance) {
       const dateDb = formatDateAndHour(date, hour)
       const updatedAt = getDateInString()
 
-      await knex('snacks').where('snackId', id).update({
-        name,
-        description,
-        date: dateDb,
-        inDiet,
-        updatedAt,
+      const updateSnackResponse = await knex('snacks')
+        .where('snackId', id)
+        .update({
+          name,
+          description,
+          date: dateDb,
+          inDiet,
+          updatedAt,
+        })
+
+      if (!updateSnackResponse) {
+        reply.status(400).send()
+      }
+
+      reply.status(200).send()
+    },
+  )
+
+  app.delete(
+    '/:id',
+    {
+      preHandler: [checkIfUserIsLoggedIn],
+    },
+    async (request, reply) => {
+      const createDeleteParamsSchema = z.object({
+        id: z.string().uuid(),
       })
+
+      const { id } = createDeleteParamsSchema.parse(request.params)
+
+      const response = await knex('snacks').where('snackId', id).del()
+
+      if (!response) {
+        reply.status(400).send()
+      }
 
       reply.status(200).send()
     },

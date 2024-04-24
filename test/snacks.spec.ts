@@ -145,7 +145,6 @@ describe('Snacks routes', () => {
       })
       .expect(200)
 
-    // list again and compare
     const updatedListSnackResponse = await request(app.server)
       .get('/snacks')
       .set('Cookie', cookies)
