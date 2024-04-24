@@ -2,7 +2,7 @@ import { randomUUID } from 'crypto'
 import { knex } from '../database'
 import { FastifyInstance } from 'fastify'
 import { z } from 'zod'
-import { getDateInString } from '../utils/format-date-and-hour'
+import { getDateInString } from '../utils/time-functions'
 
 export async function usersRoutes(app: FastifyInstance) {
   app.get('/', async () => {

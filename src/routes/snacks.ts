@@ -3,10 +3,7 @@ import { FastifyInstance } from 'fastify'
 import { z } from 'zod'
 import { knex } from '../database'
 import { checkIfUserIsLoggedIn } from '../middlewares/check-if-user-is-logged-in'
-import {
-  formatDateAndHour,
-  getDateInString,
-} from '../utils/format-date-and-hour'
+import { formatDateAndHour, getDateInString } from '../utils/time-functions'
 
 export async function snacksRoutes(app: FastifyInstance) {
   app.get(
@@ -85,7 +82,6 @@ export async function snacksRoutes(app: FastifyInstance) {
         createSnacksBodySchema.parse(request.body)
 
       const dateDb = formatDateAndHour(date, hour)
-
       const updatedAt = getDateInString()
 
       await knex('snacks').where('snackId', id).update({
