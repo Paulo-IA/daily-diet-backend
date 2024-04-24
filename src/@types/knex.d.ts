@@ -7,7 +7,7 @@ declare module 'knex/types/tables' {
       email: string
       password: string
       name: string
-      created_at: string
+      createdAt: string
     }
     snacks: {
       snackId: string
@@ -16,8 +16,8 @@ declare module 'knex/types/tables' {
       description: string
       inDiet: boolean
       date: string
-      created_at: string
-      updated_at?: string
+      createdAt: string
+      updatedAt?: string
     }
   }
 }

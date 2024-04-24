@@ -51,7 +51,7 @@ export async function snacksRoutes(app: FastifyInstance) {
         description,
         date: dateDb,
         inDiet,
-        created_at: createdAt,
+        createdAt,
       })
 
       reply.status(201).send()
@@ -89,7 +89,7 @@ export async function snacksRoutes(app: FastifyInstance) {
         description,
         date: dateDb,
         inDiet,
-        updated_at: updatedAt,
+        updatedAt,
       })
 
       reply.status(200).send()

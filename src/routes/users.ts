@@ -29,7 +29,7 @@ export async function usersRoutes(app: FastifyInstance) {
         name,
         email,
         password,
-        created_at: createdAt,
+        createdAt,
       })
 
       return reply.status(201).send()
