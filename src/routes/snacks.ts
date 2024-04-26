@@ -4,6 +4,7 @@ import { z } from 'zod'
 import { knex } from '../database'
 import { checkIfUserIsLoggedIn } from '../middlewares/check-if-user-is-logged-in'
 import { formatDateAndHour, getDateInString } from '../utils/time-functions'
+import { metricsRoutes } from './metrics'
 
 export async function snacksRoutes(app: FastifyInstance) {
   app.get(
@@ -141,4 +142,8 @@ export async function snacksRoutes(app: FastifyInstance) {
       reply.status(200).send()
     },
   )
+
+  app.register(metricsRoutes, {
+    prefix: 'metrics',
+  })
 }

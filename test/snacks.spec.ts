@@ -3,7 +3,6 @@ import request from 'supertest'
 import { app } from '../src/app'
 import { execSync } from 'node:child_process'
 import { randomEmail } from '../src/utils/random-email'
-import { object } from 'zod'
 
 beforeAll(async () => {
   await app.ready()
@@ -221,8 +220,6 @@ describe('Snacks routes', () => {
 
     const { snackId, userId, date, createdAt } =
       listAllSnacksResponse.body.snacks[0]
-
-    console.log(snackId)
 
     const listSingleSnackResponse = await request(app.server)
       .get(`/snacks/${snackId}`)
