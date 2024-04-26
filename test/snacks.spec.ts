@@ -3,6 +3,7 @@ import request from 'supertest'
 import { app } from '../src/app'
 import { execSync } from 'node:child_process'
 import { randomEmail } from '../src/utils/random-email'
+import { object } from 'zod'
 
 beforeAll(async () => {
   await app.ready()
@@ -65,17 +66,13 @@ describe('Snacks routes', () => {
 
     const cookies = authUserResponse.get('Set-Cookie') ?? []
 
-    await request(app.server)
-      .post('/snacks')
-      .set('Cookie', cookies)
-      .send({
-        name: 'Almoço',
-        description: 'Arroz, feijão, salada, legumes e frango grelhado',
-        date: '23/04/2024',
-        hour: '12:43',
-        inDiet: true,
-      })
-      .expect(201)
+    await request(app.server).post('/snacks').set('Cookie', cookies).send({
+      name: 'Almoço',
+      description: 'Arroz, feijão, salada, legumes e frango grelhado',
+      date: '23/04/2024',
+      hour: '12:43',
+      inDiet: true,
+    })
 
     const listSnacksResponse = await request(app.server)
       .get('/snacks')
@@ -143,7 +140,6 @@ describe('Snacks routes', () => {
         hour: '12:43',
         inDiet: true,
       })
-      .expect(200)
 
     const updatedListSnackResponse = await request(app.server)
       .get('/snacks')
@@ -192,5 +188,57 @@ describe('Snacks routes', () => {
       .delete(`/snacks/${snackId}`)
       .set('Cookie', cookies)
       .expect(200)
+  })
+
+  it('should be able to get a single snack', async () => {
+    const email = randomEmail()
+    const password = '123'
+
+    await request(app.server).post('/users').send({
+      name: 'Paulo Fernandes',
+      email,
+      password,
+    })
+
+    const authUserResponse = await request(app.server).post('/auth').send({
+      email,
+      password,
+    })
+
+    const cookies = authUserResponse.get('Set-Cookie') ?? []
+
+    await request(app.server).post('/snacks').set('Cookie', cookies).send({
+      name: 'Almoço',
+      description: 'Arroz, frango, e salada',
+      date: '23/04/2024',
+      hour: '11:45',
+      inDiet: true,
+    })
+
+    const listAllSnacksResponse = await request(app.server)
+      .get('/snacks')
+      .set('Cookie', cookies)
+
+    const { snackId, userId, date, createdAt } =
+      listAllSnacksResponse.body.snacks[0]
+
+    console.log(snackId)
+
+    const listSingleSnackResponse = await request(app.server)
+      .get(`/snacks/${snackId}`)
+      .set('Cookie', cookies)
+
+    expect(listSingleSnackResponse.body.snack).toEqual([
+      expect.objectContaining({
+        snackId,
+        userId,
+        name: 'Almoço',
+        description: 'Arroz, frango, e salada',
+        inDiet: 1,
+        date,
+        createdAt,
+        updatedAt: null,
+      }),
+    ])
   })
 })

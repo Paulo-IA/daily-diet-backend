@@ -22,6 +22,24 @@ export async function snacksRoutes(app: FastifyInstance) {
     },
   )
 
+  app.get(
+    '/:id',
+    {
+      preHandler: [checkIfUserIsLoggedIn],
+    },
+    async (request) => {
+      const createGetSingleSnackSchema = z.object({
+        id: z.string().uuid(),
+      })
+
+      const snackId = createGetSingleSnackSchema.parse(request.params).id
+
+      const snack = await knex('snacks').where('snackId', snackId).select('*')
+
+      return { snack }
+    },
+  )
+
   app.post(
     '/',
     {
