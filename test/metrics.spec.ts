@@ -18,7 +18,7 @@ beforeEach(() => {
 })
 
 describe('Metrics routes', () => {
-  it.only('should be able to show the total of snacks', async () => {
+  it('should be able to show the total of snacks', async () => {
     const email = randomEmail()
     const password = '123'
 
@@ -64,5 +64,101 @@ describe('Metrics routes', () => {
       .set('Cookie', cookies)
 
     expect(metricsTotalResponse.body.totalSnacks).toEqual(3)
+  })
+
+  it('should be able to show the total of snacks in diet', async () => {
+    const email = randomEmail()
+    const password = '123'
+
+    await request(app.server).post('/users').send({
+      name: 'Paulo Fernandes',
+      email,
+      password,
+    })
+
+    const authUserResponse = await request(app.server).post('/auth').send({
+      email,
+      password,
+    })
+
+    const cookies = authUserResponse.get('Set-Cookie') ?? []
+
+    await request(app.server).post('/snacks').set('Cookie', cookies).send({
+      name: 'Almoço',
+      description: 'Arroz, frango, e salada',
+      date: '23/04/2024',
+      hour: '11:45',
+      inDiet: true,
+    })
+
+    await request(app.server).post('/snacks').set('Cookie', cookies).send({
+      name: 'Jantar',
+      description: 'Batata, bife, e cebola',
+      date: '23/04/2024',
+      hour: '20:13',
+      inDiet: false,
+    })
+
+    await request(app.server).post('/snacks').set('Cookie', cookies).send({
+      name: 'Jantar',
+      description: 'Pizzada',
+      date: '24/04/2024',
+      hour: '23:34',
+      inDiet: false,
+    })
+
+    const totalSnacksInDietResponse = await request(app.server)
+      .get('/snacks/metrics/inDiet')
+      .set('Cookie', cookies)
+
+    expect(totalSnacksInDietResponse.body.totalOfSnacksInDiet).toEqual(1)
+  })
+
+  it('should be able to show the total of snacks out diet', async () => {
+    const email = randomEmail()
+    const password = '123'
+
+    await request(app.server).post('/users').send({
+      name: 'Paulo Fernandes',
+      email,
+      password,
+    })
+
+    const authUserResponse = await request(app.server).post('/auth').send({
+      email,
+      password,
+    })
+
+    const cookies = authUserResponse.get('Set-Cookie') ?? []
+
+    await request(app.server).post('/snacks').set('Cookie', cookies).send({
+      name: 'Almoço',
+      description: 'Arroz, frango, e salada',
+      date: '23/04/2024',
+      hour: '11:45',
+      inDiet: true,
+    })
+
+    await request(app.server).post('/snacks').set('Cookie', cookies).send({
+      name: 'Jantar',
+      description: 'Batata, bife, e cebola',
+      date: '23/04/2024',
+      hour: '20:13',
+      inDiet: false,
+    })
+
+    await request(app.server).post('/snacks').set('Cookie', cookies).send({
+      name: 'Jantar',
+      description: 'Pizzada',
+      date: '24/04/2024',
+      hour: '23:34',
+      inDiet: false,
+    })
+
+    const totalSnacksOutDietResponse = await request(app.server)
+      .get('/snacks/metrics/outDiet')
+      .set('Cookie', cookies)
+
+    expect(totalSnacksOutDietResponse.body.totalOfSnacksOutDiet).toEqual(2)
   })
 })

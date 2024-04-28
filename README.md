@@ -12,8 +12,8 @@
 
   ## /snacks/metrics
   [✅] Deve ser possível saber o total de refeições registradas.
-  [] Deve ser possível saber o total de refeições dentro da dieta.
-  [] Deve ser possível saber o total de refeições fora da dieta.
+  [✅] Deve ser possível saber o total de refeições dentro da dieta.
+  [✅] Deve ser possível saber o total de refeições fora da dieta.
   [] Deve ser possível saber a melhor sequência de refeições dentro da dieta.
 
 # RN

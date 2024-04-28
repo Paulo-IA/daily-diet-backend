@@ -15,3 +15,7 @@ export function getDateInString() {
 
   return `${nowDate}${nowHour}`
 }
+
+export function separateDateFromTime(date: string) {
+  return date.split(' ')[0]
+}
