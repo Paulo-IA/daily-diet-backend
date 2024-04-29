@@ -1,10 +1,7 @@
 import { FastifyInstance } from 'fastify'
 import { checkIfUserIsLoggedIn } from '../middlewares/check-if-user-is-logged-in'
 import { knex } from '../database'
-import {
-  getBetterSequence,
-  getSortedDatesFromSnacks,
-} from '../utils/betterSequence'
+import { getBetterSequence } from '../utils/betterSequence'
 
 export async function metricsRoutes(app: FastifyInstance) {
   app.get(
@@ -57,10 +54,9 @@ export async function metricsRoutes(app: FastifyInstance) {
     async () => {
       const snacks = await knex('snacks').select()
 
-      const days = getSortedDatesFromSnacks(snacks)
-      const betterSequence = getBetterSequence(snacks, days)
+      const betterSequence = getBetterSequence(snacks)
 
-      console.log(betterSequence)
+      return { betterSequence }
     },
   )
 }

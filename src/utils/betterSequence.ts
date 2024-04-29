@@ -1,56 +1,111 @@
-import { Snack } from '../@types/snacks'
+import { Snack, BetterSequence } from '../@types/snacks'
 import { separateDateFromTime } from './time-functions'
 
-// Find with more snacks in diet of the day
+export function getBetterSequence(snacks: Snack[]) {
+  const sortedDates = getSortedDatesFromSnacks(snacks)
 
-export function getBetterSequence(snacks: Snack[], sortedDates: string[]) {
-  const betterSequence = sortedDates.map((date) => {
-    const { snacksInDate, quantityOfSnacksInThisDayInDiet } = getSnacksInDate(
+  const snacksInDietByDate: BetterSequence[] = getQtdOfSnacksInDietByDate(
+    sortedDates,
+    snacks,
+  )
+
+  const betterSequence = sortSnacks(snacksInDietByDate, snacks)
+
+  return betterSequence
+}
+
+function getQtdOfSnacksInDietByDate(sortedDates: string[], snacks: Snack[]) {
+  const snacksAndDatesRelated = sortedDates.map((date) => {
+    const { snacksIds, qtdOfSnacksInDiet } = getSnacksInDate(date, snacks)
+    const snack: BetterSequence = {
       date,
-      snacks,
-    )
-    const snack =
-      quantityOfSnacksInThisDayInDiet <= 0
-        ? null
-        : {
-            date,
-            quantityOfSnacksInThisDayInDiet,
-            snacksInDate,
-          }
+      qtdOfSnacksInDiet,
+      snacksIds,
+    }
 
     return snack
   })
+  const snacksInDietByDate = takeOutDatesWithoutInDietSnacks(
+    snacksAndDatesRelated,
+  )
 
-  return betterSequence.filter((sequence) => sequence != null)
+  return snacksInDietByDate
+}
+
+function takeOutDatesWithoutInDietSnacks(
+  snacksAndDatesRelated: BetterSequence[],
+) {
+  return snacksAndDatesRelated.filter(
+    (sequence) => sequence.qtdOfSnacksInDiet !== 0,
+  )
+}
+
+function sortSnacks(snacksUnsorted: BetterSequence[], snacks: Snack[]) {
+  let sortedSnacks: BetterSequence[] = []
+  sortedSnacks = sortAndPushToArray(snacksUnsorted, sortedSnacks)
+
+  const dates = sortedSnacks.map((snack) => {
+    return snack.date
+  })
+
+  const dateWithTheBetterSequence = dates.sort()[dates.length - 1]
+  const betterSeq = getSnacksInDate(dateWithTheBetterSequence, snacks)
+
+  return betterSeq
+}
+
+function sortAndPushToArray(
+  unsortedArray: BetterSequence[],
+  sortedArray: BetterSequence[],
+) {
+  let maior: number = -1
+  for (let i = 0; i < unsortedArray.length; i++) {
+    if (i === 0) {
+      maior = unsortedArray[0].qtdOfSnacksInDiet
+      sortedArray.push(unsortedArray[i])
+    } else {
+      if (maior < unsortedArray[i].qtdOfSnacksInDiet) {
+        maior = unsortedArray[i].qtdOfSnacksInDiet
+        sortedArray.push(unsortedArray[i])
+      }
+
+      if (maior === unsortedArray[i].qtdOfSnacksInDiet) {
+        sortedArray.push(unsortedArray[i])
+      }
+    }
+  }
+
+  return sortedArray
 }
 
 function getSnacksInDate(date: string, snacks: Snack[]) {
-  const snacksInDate: string[] = []
+  const snacksIds: string[] = []
 
   snacks.map((snack: Snack) => {
     if (separateDateFromTime(snack.date) === date && snack.inDiet) {
-      snacksInDate.push(snack.snackId)
+      snacksIds.push(snack.snackId)
     }
 
     return snack
   })
 
-  const quantityOfSnacksInThisDayInDiet: number = snacksInDate.length
+  const qtdOfSnacksInDiet: number = snacksIds.length
 
-  return { snacksInDate, quantityOfSnacksInThisDayInDiet }
+  const snacksInDate: BetterSequence = { snacksIds, qtdOfSnacksInDiet, date }
+
+  return snacksInDate
 }
 
-export function getSortedDatesFromSnacks(snacks: Snack[]) {
-  const uniqueSnacksDate: string[] = []
-  snacks.map((snack) => {
+function getSortedDatesFromSnacks(snacks: Snack[]) {
+  const uniqueDatesOfSnacks: string[] = []
+  snacks.forEach((snack) => {
     const dateWithoutTime = separateDateFromTime(snack.date)
+    const dateAlreadyInArray = uniqueDatesOfSnacks.indexOf(dateWithoutTime) < 0
 
-    if (uniqueSnacksDate.indexOf(dateWithoutTime) < 0) {
-      uniqueSnacksDate.push(dateWithoutTime)
+    if (dateAlreadyInArray) {
+      uniqueDatesOfSnacks.push(dateWithoutTime)
     }
-
-    return uniqueSnacksDate.sort()
   })
 
-  return uniqueSnacksDate
+  return uniqueDatesOfSnacks.sort()
 }

@@ -161,4 +161,73 @@ describe('Metrics routes', () => {
 
     expect(totalSnacksOutDietResponse.body.totalOfSnacksOutDiet).toEqual(2)
   })
+
+  it('should be able to show the better sequence of snacks in diet', async () => {
+    const email = randomEmail()
+    const password = '123'
+
+    await request(app.server).post('/users').send({
+      name: 'Paulo Fernandes',
+      email,
+      password,
+    })
+
+    const authUserResponse = await request(app.server).post('/auth').send({
+      email,
+      password,
+    })
+
+    const cookies = authUserResponse.get('Set-Cookie') ?? []
+
+    await request(app.server).post('/snacks').set('Cookie', cookies).send({
+      name: 'Almoço',
+      description: 'Arroz, frango, e salada',
+      date: '23/04/2024',
+      hour: '11:45',
+      inDiet: true,
+    })
+
+    await request(app.server).post('/snacks').set('Cookie', cookies).send({
+      name: 'Jantar',
+      description: 'Batata, bife, e cebola',
+      date: '23/04/2024',
+      hour: '20:13',
+      inDiet: true,
+    })
+
+    await request(app.server).post('/snacks').set('Cookie', cookies).send({
+      name: 'Café da tarde',
+      description: 'Geléia',
+      date: '24/04/2024',
+      hour: '15:34',
+      inDiet: true,
+    })
+
+    await request(app.server).post('/snacks').set('Cookie', cookies).send({
+      name: 'Jantar',
+      description: 'Frango e batata doce',
+      date: '24/04/2024',
+      hour: '23:40',
+      inDiet: true,
+    })
+
+    const getSnacksResponse = await request(app.server)
+      .get('/snacks')
+      .set('Cookie', cookies)
+
+    const snackIdFirst = getSnacksResponse.body.snacks[2].snackId
+    const snackIdSecond = getSnacksResponse.body.snacks[3].snackId
+
+    const betterSequence = await request(app.server)
+      .get('/snacks/metrics/betterSequence')
+      .set('Cookie', cookies)
+
+    expect(betterSequence.body.betterSequence).toEqual(
+      expect.objectContaining({
+        snacksIds: [snackIdFirst, snackIdSecond],
+        qtdOfSnacksInDiet: 2,
+        date: '2024-04-24',
+      }),
+    )
+  })
 })

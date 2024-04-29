@@ -8,3 +8,9 @@ export interface Snack {
   createdAt: string
   updatedAt?: string
 }
+
+export interface BetterSequence {
+  qtdOfSnacksInDiet: number
+  snacksIds: string[]
+  date: string
+}
